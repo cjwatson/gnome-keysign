@@ -95,22 +95,23 @@ class WormholeOffer:
             log.info("Got data, %d bytes" % len(msg))
             success, error_msg = self._check_received(msg)
             self.stop()
-            return success, error_msg
 
         except (ServerConnectionError, WrongPasswordError) as e:
             error = dedent(e.__doc__)
             log.error("Error: %s" % error)
             success = False
-            return success, e
+            error_msg = e
         except LonelyError as le:
             log.info("Lonely, close() was called before the peer connection could be established")
             success = False
-            return success, le
+            error_msg = le
         except Exception as e:
             error = dedent(e.__doc__)
             log.error("An unknown error occurred: %s" % error)
             success = False
-            return success, e
+            error_msg = e
+
+        return success, error_msg
 
     def _check_received(self, msg):
         """If the received message has a field 'answer' that means that the transfer
